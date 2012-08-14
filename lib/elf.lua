@@ -135,3 +135,20 @@ _elf.find_section = function( self, sname )
   return self.name_to_sect[ sname ]
 end
 
+-- Gets the correct section name, taking into account the "special" section indexes
+_elf.get_section_name = function( self, idx )
+  if idx >= ct.SHN_LOPROC and idx <= ct.SHN_HIPROC then
+    return "[CPUSPEC]"
+  elseif idx >= ct.SHN_LOOS and idx <= ct.SHN_HIOS then
+    return "[OSSPEC]"
+  elseif idx == ct.SHN_ABS then
+    return "[ABS]"
+  elseif idx == ct.SHN_COMMON then
+    return "[COMMON]"
+  elseif idx == ct.SHN_XINDEX then
+    return "[XINDEX]"
+  else
+    return self:get_section_at( idx ):get_name()
+  end
+end
+

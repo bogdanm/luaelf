@@ -56,7 +56,7 @@ end
 istream._read_u16 = function( self )
   local d = self:read( 2 )
   assert( #d == 2 )
-  local _, res = string.unpack( d, self.endianness == "big" and ">H" or "<h" )
+  local _, res = string.unpack( d, self.endianness == "big" and ">H" or "<H" )
   return res
 end
 

@@ -42,12 +42,12 @@ print ""
 -- (an instance of 'elfysmtab')
 print "List of the first 10 symbols of type 'function' and global binding:"
 local cnt = 0
-print( "Name                 Value     Type   Binding   Sect" )
+print( "Name                                  Value     Type        Binding   Sect" )
 -- One can also iterate over symbols with a filter. Symbols can be filtered by
 -- type, binding, the section to which the link and visibility. Below we only
--- filter by type and visibility
+-- filter by type and binding
 for _, s in sym:iterator{ type = ct.STT_FUNC, binding = ct.STB_GLOBAL } do
-  print( sf( "%-20s %08X  %-5s  %-8s  %s", s:get_name(), s:get_value(), s:get_type_str(), s:get_binding_str(), f:get_section_at( s:get_section_idx() ):get_name() ) )
+  print( sf( "%-37s %08X  %-10s  %-8s  %s", s:get_name(), s:get_value(), s:get_type_str(), s:get_binding_str(), f:get_section_name( s:get_section_idx() ) ) )
   cnt = cnt + 1
   if cnt == 10 then break end
 end
