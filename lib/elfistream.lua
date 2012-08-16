@@ -4,6 +4,7 @@
 module( ..., package.seeall )
 require "pack"
 local cl = require "classes"
+local bit = require "bit"
 
 local istream = cl.new_class( "elfistream", "object", "ELF stream interface" )
 
@@ -67,12 +68,38 @@ istream._read_u8 = function( self )
   return res
 end
 
+istream._read_u64 = function( self )
+  local l, h = self:_read_u32()
+  if self.endianness == "big" then l, h = h, l end
+  if h > 2 ^ 21 then error( "64-bit number overflow" ) end
+  return h * ( 2 ^ 32 ) + l
+end
+
+istream._read_s64 = function( self )
+  local l, h = self:_read_u32()
+  if self.endianness == "big" then l, h = h, l end
+  local sign = 1
+  if bit.band( h, 0x80000000 ) ~= 0 then -- this is a negative number
+    h, l, sign = bit.bnot( h ), bit.bnot( l ) + 1, -1
+    if bit.band( l, 0xFFFFFFFF ) == 0 then h, l = h + 1, 0 end
+  end
+  if h > 2 ^ 21 then error( "64-bit number overflow" ) end
+  return sign * ( h * ( 2 ^ 32 ) + l )
+end
+
 istream.read_elf32_addr = istream._read_u32
 istream.read_elf32_half = istream._read_u16
 istream.read_elf32_off = istream._read_u32
 istream.read_elf32_sword = istream._read_s32
 istream.read_elf32_word = istream._read_u32
 istream.read_unsigned_char = istream._read_u8
+istream.read_elf64_addr = istream._read_u64
+istream.read_elf64_off = istream._read_u64
+istream.read_elf64_half = istream._read_u16
+istream.read_elf64_word = istream._read_u32
+istream.read_elf64_sword = istream._read_s32
+istream.read_elf64_xword = istream._read_u64
+istream.read_elf64_sxword = istream._read_s64
 
 local function gen_read_with_offset( t, fname )
   t[ fname .. "_off" ] = function( self, offset )
@@ -84,10 +111,10 @@ local function gen_read_with_offset( t, fname )
   end
 end
 
-gen_read_with_offset( istream, "read_elf32_addr" )
-gen_read_with_offset( istream, "read_elf32_half" )
-gen_read_with_offset( istream, "read_elf32_off" )
-gen_read_with_offset( istream, "read_elf32_sword" )
-gen_read_with_offset( istream, "read_elf32_word" )
-gen_read_with_offset( istream, "read_unsigned_char" )
+local flist = { "read_elf32_addr", "read_elf32_half", "read_elf32_off", "read_elf32_sword",
+  "read_elf32_word", "read_unsigned_char", "read_elf64_addr", "read_elf64_off", "read_elf64_half",
+  "read_elf64_word", "read_elf64_sword", "read_elf64_xword", "read_elf64_sxword" }
+for _, v in pairs( flist ) do
+  gen_read_with_offset( istream, v )
+end  
 

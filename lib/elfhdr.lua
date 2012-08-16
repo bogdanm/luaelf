@@ -26,7 +26,20 @@ _elfh._loadident = function( self, data )
     error "invalid ELF header"
   end
   -- Get class
-  if data[ ct.EI_CLASS ] ~= ct.ELFCLASS32 then error "only 32-bit ELF files are supported" end
+  self.bitness = data[ ct.EI_CLASS ] == ct.ELF_CLASS32 and 32 or 64
+  if data[ ct.EI_CLASS ] == ct.ELF_CLASS32 then
+    self.bitness = 32
+    self.read_half = self.stream.read_elf32_half
+    self.read_word = self.stream.read_elf32_word
+    self.read_addr = self.stream.read_elf32_addr
+    self.read_off = self.stream.read_elf32_off
+  else
+    self.bitness = 64
+    self.read_half = self.stream.read_elf64_half
+    self.read_word = self.stream.read_elf64_word
+    self.read_addr = self.stream.read_elf64_addr
+    self.read_off = self.stream.read_elf64_off
+  end
   -- Get endianness
   if data[ ct.EI_DATA ] == ct.ELFDATANONE then error "invalid data encoding in ELF header" end
   self.endian = data[ ct.EI_DATA ] == ct.ELFDATA2LSB and "little" or "big"
@@ -84,6 +97,7 @@ elfutils.generate_accessors( _elfh, {
   { "strtab_index", "e_shstrndx" },
   { "osabi", "osabi" },
   { "osabi_str", "osabi", ct.elf_osabi_map },
-  { "abi_version", "abiversion" }
+  { "abi_version", "abiversion" },
+  { "bitness", "bitness" }
 } )
 
