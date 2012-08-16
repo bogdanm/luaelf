@@ -23,7 +23,7 @@ Missing
 
 * 64-bit ELF support
 * Parsing program headers
-* Parsing shared library data (DT_INTERP, DT_NEEDED...)
+* Parsing shared library data (DT\_INTERP, DT\_NEEDED...)
 * Machine-specific support
 * Write support (read-only for now)
 * Proper documentation
