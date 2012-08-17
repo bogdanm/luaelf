@@ -7,15 +7,14 @@ module( ..., package.seeall )
 local elfutils = require "elfutils"
 local elfhdr = require "elfhdr"
 local elfstream = require "elffstream"
-local elfsect = require "elfsect"
-local sf = string.format
 local elfstrtab = require "elfstrtab"
-local elfsymtab = require "elfsymtab"
 local elfrelsect = require "elfrelsect"
 local cl = require "classes"
 local ct = require "elfct"
-local sf = string.format
 local bit = require "bit"
+local sf = string.format
+local elfsect = require "elfsect"
+local elfsymtab = require "elfsymtab"
 
 local _elf = cl.new_class( "elf", "object", "ELF file handler" )
 
@@ -62,7 +61,7 @@ _elf._load_sections = function( self )
   end
   -- Link SYMTAB sections to their corresponding string tab section
   for i = 1, numsect do
-    if self.sections[ i ]:get_type() == ct.SHT_SYMTAB then
+    if self.sections[ i ]:get_type() == ct.SHT_SYMTAB or self.sections[ i ]:get_type() == ct.SHT_DYNSYM then
       local s = self.sections[ i ]
       local strtabsect = self.sections[ s:get_link() + 1 ] 
       assert( strtabsect:get_type() == ct.SHT_STRTAB )
@@ -147,6 +146,8 @@ _elf.get_section_name = function( self, idx )
     return "[COMMON]"
   elseif idx == ct.SHN_XINDEX then
     return "[XINDEX]"
+  elseif idx == ct.SHN_UNDEF then
+    return "[UNDEF]"
   else
     return self:get_section_at( idx ):get_name()
   end

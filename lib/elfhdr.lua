@@ -26,20 +26,20 @@ _elfh._loadident = function( self, data )
     error "invalid ELF header"
   end
   -- Get class
-  self.bitness = data[ ct.EI_CLASS ] == ct.ELF_CLASS32 and 32 or 64
-  if data[ ct.EI_CLASS ] == ct.ELF_CLASS32 then
-    self.bitness = 32
+  if data[ ct.EI_CLASS ] == ct.ELFCLASS32 then
+    self.bitness = "32"
     self.read_half = self.stream.read_elf32_half
     self.read_word = self.stream.read_elf32_word
     self.read_addr = self.stream.read_elf32_addr
     self.read_off = self.stream.read_elf32_off
   else
-    self.bitness = 64
+    self.bitness = "64"
     self.read_half = self.stream.read_elf64_half
     self.read_word = self.stream.read_elf64_word
     self.read_addr = self.stream.read_elf64_addr
     self.read_off = self.stream.read_elf64_off
   end
+  self.stream:set_bitness( self.bitness )
   -- Get endianness
   if data[ ct.EI_DATA ] == ct.ELFDATANONE then error "invalid data encoding in ELF header" end
   self.endian = data[ ct.EI_DATA ] == ct.ELFDATA2LSB and "little" or "big"
@@ -58,22 +58,22 @@ _elfh.load = function( self )
   -- First interpret ident data
   self:_loadident( data )
   -- Then the rest of the header
-  local tmp = self.stream:read_elf32_half()
+  local tmp = self.read_half( self.stream )
   if not ct.elf_type_to_str( tmp ) then error "invalid ELF type" end
   self.e_type = tmp
-  self.e_machine = self.stream:read_elf32_half()
-  tmp = self.stream:read_elf32_word()
+  self.e_machine = self.read_half( self.stream )
+  tmp = self.read_word( self.stream )
   if tmp ~= ct.EV_CURRENT then error "invalid ELF version in header" end
-  self.e_entry = self.stream:read_elf32_addr()
-  self.e_phoff = self.stream:read_elf32_off()
-  self.e_shoff = self.stream:read_elf32_off()
-  self.e_flags = self.stream:read_elf32_word()
-  self.e_ehsize = self.stream:read_elf32_half()
-  self.e_phentsize = self.stream:read_elf32_half()
-  self.e_phnum = self.stream:read_elf32_half()
-  self.e_shentsize = self.stream:read_elf32_half()
-  self.e_shnum = self.stream:read_elf32_half()
-  self.e_shstrndx = self.stream:read_elf32_half()
+  self.e_entry = self.read_addr( self.stream )
+  self.e_phoff = self.read_off( self.stream )
+  self.e_shoff = self.read_off( self.stream )
+  self.e_flags = self.read_word( self.stream )
+  self.e_ehsize = self.read_half( self.stream )
+  self.e_phentsize = self.read_half( self.stream )
+  self.e_phnum = self.read_half( self.stream )
+  self.e_shentsize = self.read_half( self.stream )
+  self.e_shnum = self.read_half( self.stream )
+  self.e_shstrndx = self.read_half( self.stream )
   return self
 end
 

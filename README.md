@@ -21,7 +21,6 @@ Features
 Missing
 =======
 
-* 64-bit ELF support
 * Parsing program headers
 * Parsing shared library data (DT\_INTERP, DT\_NEEDED...)
 * Machine-specific support

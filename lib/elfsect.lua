@@ -10,7 +10,7 @@ local bit = require "bit"
 ---------------------------------------
 -- ELF section object
 
-local _sect = cl.new_class( "elfsect", "object", "ELF section handler" )
+local _sect = cl.new_class( "elfsect", "object", "ELF section handler (generic)" )
 _sect.__tostring = function( self )
   return sf( "[%s '%s']", self:get_class_name(), self:get_name() )
 end
@@ -29,16 +29,29 @@ end
 _sect.load = function( self )
   local s = self.stream
   s:seek( self.offset )
-  self.sh_name = s:read_elf32_word()
-  self.sh_type = s:read_elf32_word()
-  self.sh_flags = s:read_elf32_word()
-  self.sh_addr = s:read_elf32_addr()
-  self.sh_offset = s:read_elf32_off()
-  self.sh_size = s:read_elf32_word()
-  self.sh_link = s:read_elf32_word()
-  self.sh_info = s:read_elf32_word()
-  self.sh_addralign = s:read_elf32_word()
-  self.sh_entsize = s:read_elf32_word()
+  if self.stream:get_bitness() == "32" then
+    self.sh_name = s:read_elf32_word()
+    self.sh_type = s:read_elf32_word()
+    self.sh_flags = s:read_elf32_word()
+    self.sh_addr = s:read_elf32_addr()
+    self.sh_offset = s:read_elf32_off()
+    self.sh_size = s:read_elf32_word()
+    self.sh_link = s:read_elf32_word()
+    self.sh_info = s:read_elf32_word()
+    self.sh_addralign = s:read_elf32_word()
+    self.sh_entsize = s:read_elf32_word()
+  else
+    self.sh_name = s:read_elf64_word()
+    self.sh_type = s:read_elf64_word()
+    self.sh_flags = s:read_elf64_xword()
+    self.sh_addr = s:read_elf64_addr()
+    self.sh_offset = s:read_elf64_off()
+    self.sh_size = s:read_elf64_xword()
+    self.sh_link = s:read_elf64_word()
+    self.sh_info = s:read_elf64_word()
+    self.sh_addralign = s:read_elf64_xword()
+    self.sh_entsize = s:read_elf64_xword()
+  end
   return self
 end
 

@@ -26,12 +26,21 @@ end
 _elfsym.load = function( self )
   local s = self.stream
   s:seek( self.offset )
-  self.st_name = s:read_elf32_word()
-  self.st_value = s:read_elf32_addr()
-  self.st_size = s:read_elf32_word()
-  self.st_info = s:read_unsigned_char()
-  self.st_other = s:read_unsigned_char()
-  self.st_shndx = s:read_elf32_half()
+  if s:get_bitness() == "32" then
+    self.st_name = s:read_elf32_word()
+    self.st_value = s:read_elf32_addr()
+    self.st_size = s:read_elf32_word()
+    self.st_info = s:read_unsigned_char()
+    self.st_other = s:read_unsigned_char()
+    self.st_shndx = s:read_elf32_half()
+  else
+    self.st_name = s:read_elf64_word()
+    self.st_info = s:read_unsigned_char()
+    self.st_other = s:read_unsigned_char()
+    self.st_shndx = s:read_elf64_half()
+    self.st_value = s:read_elf64_addr()
+    self.size = s:read_elf64_xword()
+  end
   return self
 end
 

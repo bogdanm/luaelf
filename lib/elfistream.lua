@@ -69,14 +69,14 @@ istream._read_u8 = function( self )
 end
 
 istream._read_u64 = function( self )
-  local l, h = self:_read_u32()
+  local l, h = self:_read_u32(), self:_read_u32()
   if self.endianness == "big" then l, h = h, l end
   if h > 2 ^ 21 then error( "64-bit number overflow" ) end
   return h * ( 2 ^ 32 ) + l
 end
 
 istream._read_s64 = function( self )
-  local l, h = self:_read_u32()
+  local l, h = self:_read_u32(), self:_read_u32()
   if self.endianness == "big" then l, h = h, l end
   local sign = 1
   if bit.band( h, 0x80000000 ) ~= 0 then -- this is a negative number
@@ -85,6 +85,14 @@ istream._read_s64 = function( self )
   end
   if h > 2 ^ 21 then error( "64-bit number overflow" ) end
   return sign * ( h * ( 2 ^ 32 ) + l )
+end
+
+istream.set_bitness = function( self, bitness )
+  self.bitness = bitness
+end
+
+istream.get_bitness = function( self )
+  return self.bitness
 end
 
 istream.read_elf32_addr = istream._read_u32

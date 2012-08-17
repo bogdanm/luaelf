@@ -31,7 +31,7 @@ objtable.get_class_type = function( self )
 end
 
 -- Report a function as "abstract" (no implementation)
-abstract = function()
-  error( sf( "Function '%s' does not have an implementation", debug.getinfo( 2, "n" ).name ) )
+objtable.abstract = function( self )
+  error( sf( "Function '%s' in class '%s' does not have an implementation", debug.getinfo( 2, "n" ).name, self:get_class_name() ) )
 end
 

@@ -15,7 +15,11 @@ end
 _rela.load = function( self )
   local s = self.stream
   _rela.base.load( self )
-  self.r_addend = s:read_elf32_sword()
+  if s:get_bitness() == "32" then
+    self.r_addend = s:read_elf32_sword()
+  else
+    self.r_addend = s:read_elf64_sxword()
+  end
   return self
 end
 

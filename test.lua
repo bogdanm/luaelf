@@ -17,6 +17,7 @@ local hdr = f:get_header()
 -- that respect a set of constraints. It's possible to filter sections
 -- by type and flags
 local sym = f:filter_sections{ type = ct.SHT_SYMTAB }[ 1 ]
+if not sym then sym = f:filter_sections{ type = ct.SHT_DYNSYM }[ 1 ] end
 
 -- Print ELF information as decoded by our 'elfhdr' instance
 print( sf( "File type:  %s", hdr:get_type_str() ) )
