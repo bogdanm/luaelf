@@ -5,6 +5,7 @@ package.path = package.path .. ";lib/?.lua;lib/class/?.lua"
 local sf = string.format
 local ct = require "elfct"
 local elf = require 'elf'
+local elfver = require 'elfver'
 
 local args = { ... }
 -- Get a new 'elf' object instance and load the corresponding ELF file.
@@ -18,8 +19,10 @@ local hdr = f:get_header()
 -- by type and flags
 local sym = f:filter_sections{ type = ct.SHT_SYMTAB }[ 1 ]
 if not sym then sym = f:filter_sections{ type = ct.SHT_DYNSYM }[ 1 ] end
+local ver = elfver.new()
 
 -- Print ELF information as decoded by our 'elfhdr' instance
+print( sf( "Library version: %s\n", ( ver:get_current_version() ) ) )
 print( sf( "File type:  %s", hdr:get_type_str() ) )
 print( sf( "Machine:    %s", hdr:get_machine_str() ) )
 print( sf( "Endianness: %s", hdr:get_endianness() ) )
