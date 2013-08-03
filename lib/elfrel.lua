@@ -12,7 +12,7 @@ _rel.__tostring = function( self )
 end
 
 new = function( stream, offset, elfobj, link )
-  local self = cl.new_instsance( "elfrel" )
+  local self = cl.new_instance( "elfrel" )
   self:init( stream, offset, elfobj, link )
   return self
 end
