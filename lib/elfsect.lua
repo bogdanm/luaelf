@@ -70,7 +70,7 @@ end
 
 _sect.get_data = function( self )
   if not self.data then
-    self.data = self.stream:read_off( self.sh_size, self.offset )
+    self.data = self.stream:read_off( self.sh_size, self.sh_offset )
   end
   return self.data
 end
